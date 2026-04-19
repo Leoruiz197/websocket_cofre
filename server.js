@@ -1,13 +1,20 @@
 const express = require('express');
 const WebSocket = require('ws');
 
-const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(express.json());
 
-let clients = [];
+const PORT = process.env.PORT || 3000;
 
+// ===== SERVIDOR HTTP =====
+const server = app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+});
+
+// ===== WEBSOCKET =====
 const wss = new WebSocket.Server({ server });
+
+let clients = [];
 
 wss.on('connection', (ws) => {
     console.log('ESP32 conectado');
@@ -57,16 +64,9 @@ app.post('/led', (req, res) => {
     return res.status(400).json({ error: 'Ação inválida' });
 });
 
-// ===== STATUS (opcional, útil pra debug) =====
+// ===== STATUS =====
 app.get('/status', (req, res) => {
     return res.json({
         connected_clients: clients.length
     });
 });
-
-// ===== SERVIDOR HTTP =====
-
-const server = app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
-});
-
