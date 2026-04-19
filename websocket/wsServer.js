@@ -1,7 +1,6 @@
 const WebSocket = require('ws');
 const {
     registerDevice,
-    updateStatus,
     updateDeviceState
 } = require('../services/deviceService');
 
