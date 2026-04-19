@@ -1,6 +1,7 @@
 const express = require('express');
 const WebSocket = require('ws');
 
+const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(express.json());
 
@@ -65,8 +66,9 @@ app.get('/status', (req, res) => {
 });
 
 // ===== SERVIDOR HTTP =====
-app.listen(3000, () => {
-    console.log('HTTP rodando em http://localhost:3000');
+
+const server = app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
 
-console.log('WebSocket rodando na porta 8080');
+const wss = new WebSocket.Server({ server });
