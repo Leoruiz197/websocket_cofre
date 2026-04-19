@@ -28,6 +28,17 @@ module.exports.updateCommand = async (deviceId, commands) => {
     );
 };
 
+module.exports.updateDeviceState = async (deviceId, state) => {
+    return await Device.findOneAndUpdate(
+        { deviceId },
+        {
+            state,
+            lastSeen: new Date()
+        },
+        { new: true }
+    );
+};
+
 module.exports.getAllDevices = async () => {
     return await Device.find();
 };

@@ -1,7 +1,8 @@
 const WebSocket = require('ws');
 const {
     registerDevice,
-    updateStatus
+    updateStatus,
+    updateDeviceState
 } = require('../services/deviceService');
 
 let clients = {};
@@ -9,37 +10,28 @@ let clients = {};
 module.exports = (server) => {
     const wss = new WebSocket.Server({ server });
 
-    wss.on('connection', (ws) => {
-        console.log('Novo cliente conectado');
+    ws.on('message', async (message) => {
+        try {
+            const data = JSON.parse(message.toString());
 
-        ws.on('message', async (message) => {
-            try {
-                const data = JSON.parse(message.toString());
+            // REGISTRO
+            if (data.device) {
+                ws.deviceId = data.device;
+                clients[data.device] = ws;
 
-                if (data.device) {
-                    ws.deviceId = data.device;
-                    clients[data.device] = ws;
-
-                    console.log(`Dispositivo registrado: ${data.device}`);
-                    await registerDevice(data.device);
-                }
-
-                if (data.status && ws.deviceId) {
-                    console.log(`Status de ${ws.deviceId}: ${data.status}`);
-                    await updateStatus(ws.deviceId, data.status);
-                }
-
-            } catch (err) {
-                console.log('Mensagem inválida:', message.toString());
+                await registerDevice(data.device);
             }
-        });
 
-        ws.on('close', () => {
-            if (ws.deviceId) {
-                console.log(`Dispositivo desconectado: ${ws.deviceId}`);
-                delete clients[ws.deviceId];
+            // 🔥 NOVO: STATUS COMPLETO
+            if (data.type === "status" && data.device && data.state) {
+                console.log(`Estado recebido de ${data.device}:`, data.state);
+
+                await updateDeviceState(data.device, data.state);
             }
-        });
+
+        } catch (err) {
+            console.log('Mensagem inválida:', message.toString());
+        }
     });
 
     return { clients };
