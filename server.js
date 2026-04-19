@@ -92,6 +92,7 @@ app.get('/devices', (req, res) => {
 // ===== STATUS =====
 app.get('/status', (req, res) => {
     return res.json({
-        connected_clients: clients.length
+        total: Object.keys(clients).length,
+        devices: Object.keys(clients)
     });
 });
