@@ -6,6 +6,7 @@ const setupWebSocket = require('./websocket/wsServer');
 
 const commandRoutes = require('./routes/commandRoutes');
 const deviceRoutes = require('./routes/deviceRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 app.use(express.json());
@@ -21,6 +22,7 @@ const { clients } = setupWebSocket(server);
 // Rotas
 app.use('/commands', commandRoutes(clients));
 app.use('/devices', deviceRoutes);
+app.use('/users', userRoutes);
 
 // Status
 app.get('/status', (req, res) => {
