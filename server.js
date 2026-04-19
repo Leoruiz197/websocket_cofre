@@ -14,54 +14,80 @@ const server = app.listen(PORT, () => {
 // ===== WEBSOCKET =====
 const wss = new WebSocket.Server({ server });
 
-let clients = [];
+let clients = {};
 
 wss.on('connection', (ws) => {
     console.log('ESP32 conectado');
     clients.push(ws);
 
     ws.on('message', (message) => {
-        console.log('Mensagem do ESP32:', message.toString());
+        try {
+            const data = JSON.parse(message.toString());
+
+            // REGISTRO DO DISPOSITIVO
+            if (data.device) {
+                ws.deviceId = data.device;
+                clients[data.device] = ws;
+
+                console.log(`Dispositivo registrado: ${data.device}`);
+            }
+
+        } catch (err) {
+            console.log('Mensagem inválida:', message.toString());
+        }
     });
 
     ws.on('close', () => {
-        console.log('ESP32 desconectado');
-        clients = clients.filter(c => c !== ws);
+        if (ws.deviceId) {
+            console.log(`Dispositivo desconectado: ${ws.deviceId}`);
+            delete clients[ws.deviceId];
+        }
     });
 });
 
 // ===== FUNÇÃO DE ENVIO =====
-function sendCommand(action) {
+function sendCommand(deviceId, action) {
+    const client = clients[deviceId];
+
+    if (!client || client.readyState !== WebSocket.OPEN) {
+        console.log(`Dispositivo ${deviceId} não conectado`);
+        return false;
+    }
+
     const message = JSON.stringify({ action });
+    client.send(message);
 
-    clients.forEach(client => {
-        if (client.readyState === WebSocket.OPEN) {
-            client.send(message);
-        }
-    });
-
-    console.log('Enviado:', message);
+    console.log(`Enviado para ${deviceId}:`, message);
+    return true;
 }
 
 // ===== ENDPOINT HTTP =====
 app.post('/led', (req, res) => {
-    const { action } = req.body;
+    const { device, action } = req.body;
 
-    if (!action) {
-        return res.status(400).json({ error: 'action é obrigatório' });
+    if (!device || !action) {
+        return res.status(400).json({ error: 'device e action são obrigatórios' });
     }
 
-    if (action === 'on') {
-        sendCommand('LED_ON');
-        return res.json({ message: 'LED ligado' });
+    let command;
+
+    if (action === 'on') command = 'LED_ON';
+    else if (action === 'off') command = 'LED_OFF';
+    else return res.status(400).json({ error: 'Ação inválida' });
+
+    const success = sendCommand(device, command);
+
+    if (!success) {
+        return res.status(404).json({ error: 'Dispositivo não conectado' });
     }
 
-    if (action === 'off') {
-        sendCommand('LED_OFF');
-        return res.json({ message: 'LED desligado' });
-    }
+    return res.json({ message: `Comando enviado para ${device}` });
+});
 
-    return res.status(400).json({ error: 'Ação inválida' });
+app.get('/devices', (req, res) => {
+    return res.json({
+        devices: Object.keys(clients)
+    });
 });
 
 // ===== STATUS =====
