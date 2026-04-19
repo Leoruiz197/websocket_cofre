@@ -18,7 +18,6 @@ let clients = {};
 
 wss.on('connection', (ws) => {
     console.log('ESP32 conectado');
-    clients.push(ws);
 
     ws.on('message', (message) => {
         try {
