@@ -5,9 +5,6 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(express.json());
 
-// ===== WEBSOCKET =====
-const wss = new WebSocket.Server({ port: 8080 });
-
 let clients = [];
 
 wss.on('connection', (ws) => {
