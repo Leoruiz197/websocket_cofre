@@ -1,19 +1,26 @@
 const express = require('express');
 const http = require('http');
 
+const connectDB = require('./config/db');
 const setupWebSocket = require('./websocket/wsServer');
-const ledRoutes = require('./routes/ledRoutes');
+
+const commandRoutes = require('./routes/commandRoutes');
+const deviceRoutes = require('./routes/deviceRoutes');
 
 const app = express();
 app.use(express.json());
+
+// Conecta MongoDB
+connectDB();
 
 const server = http.createServer(app);
 
 // Inicializa WebSocket
 const { clients } = setupWebSocket(server);
 
-// Injeta clients nas rotas
-app.use('/led', ledRoutes(clients));
+// Rotas
+app.use('/commands', commandRoutes(clients));
+app.use('/devices', deviceRoutes);
 
 // Status
 app.get('/status', (req, res) => {

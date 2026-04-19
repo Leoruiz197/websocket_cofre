@@ -21,6 +21,7 @@
   "homepage": "https://github.com/Leoruiz197/websocket_cofre#readme",
   "dependencies": {
     "express": "^5.2.1",
+    "mongoose": "^8.23.0",
     "ws": "^8.20.0"
   }
 }
