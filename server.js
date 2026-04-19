@@ -7,6 +7,8 @@ app.use(express.json());
 
 let clients = [];
 
+const wss = new WebSocket.Server({ server });
+
 wss.on('connection', (ws) => {
     console.log('ESP32 conectado');
     clients.push(ws);
@@ -68,4 +70,3 @@ const server = app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
 
-const wss = new WebSocket.Server({ server });
