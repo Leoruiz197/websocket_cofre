@@ -19,74 +19,70 @@ Este projeto implementa um sistema de controle remoto para dispositivos (como co
 
 ## 🧠 Arquitetura
 
-
-ESP32 <---> WebSocket Server (Node.js) <---> MongoDB
-|
-Express API
-|
-Usuários
-
+ESP32  <--->  WebSocket Server (Node.js)  <---> MongoDB  
+                     |  
+                 Express API  
+                     |  
+                  Usuários  
 
 ---
 
 ## 📁 Estrutura do Projeto
 
-
 backend/
 ├── config/
-│ └── db.js
+│   └── db.js
 ├── controllers/
-│ ├── commandController.js
-│ ├── userController.js
-│ └── adminController.js
+│   ├── commandController.js
+│   ├── userController.js
+│   └── adminController.js
 ├── middleware/
-│ └── authMiddleware.js
+│   └── authMiddleware.js
 ├── models/
-│ ├── Device.js
-│ ├── User.js
-│ └── Admin.js
+│   ├── Device.js
+│   ├── User.js
+│   └── Admin.js
 ├── routes/
-│ ├── commandRoutes.js
-│ ├── deviceRoutes.js
-│ ├── userRoutes.js
-│ └── adminRoutes.js
+│   ├── commandRoutes.js
+│   ├── deviceRoutes.js
+│   ├── userRoutes.js
+│   └── adminRoutes.js
 ├── services/
-│ ├── deviceService.js
-│ ├── wsService.js
-│ ├── userService.js
-│ └── adminService.js
+│   ├── deviceService.js
+│   ├── wsService.js
+│   ├── userService.js
+│   └── adminService.js
 ├── websocket/
-│ └── wsServer.js
+│   └── wsServer.js
 ├── server.js
 └── package.json
-
 
 ---
 
 ## ⚙️ Tecnologias Utilizadas
 
-- Node.js + Express
-- WebSocket (`ws`)
-- MongoDB + Mongoose
-- JWT (autenticação)
-- ESP32 (Arduino)
-- ArduinoJson
+- Node.js + Express  
+- WebSocket (ws)  
+- MongoDB + Mongoose  
+- JWT  
+- ESP32  
+- ArduinoJson  
 
 ---
 
-## 🔌 Comunicação com ESP32
+## 🔌 Comunicação
 
-### 📤 Envio de comandos
+### Envio
 
-```json
 {
   "type": "batch",
   "commands": [
-    { "command": "LED", "value": "ON" },
-    { "command": "LOCK", "value": "OPEN" }
+    { "command": "LED", "value": "ON" }
   ]
 }
-📥 Resposta do ESP32
+
+### Resposta
+
 {
   "type": "status",
   "device": "cofre1",
@@ -94,95 +90,26 @@ backend/
     "LED": "ON"
   }
 }
-🗄️ Persistência
 
-Exemplo no MongoDB:
+---
 
-{
-  "deviceId": "cofre1",
-  "state": {
-    "LED": "ON"
-  },
-  "lastCommand": [
-    { "command": "LED", "value": "ON" }
-  ],
-  "lastSeen": "2026-04-19T15:12:01.278Z"
-}
-🔐 Autenticação
-Login de usuário
+## 🔐 Autenticação
+
 POST /users/login
+
 {
   "email": "usuario@email.com"
 }
 
-Resposta:
+---
 
-{
-  "token": "JWT_TOKEN",
-  "user": { ... }
-}
-Uso do token
-Authorization: Bearer SEU_TOKEN
-👨‍💼 Admin
-Login
-POST /admin/login
-🔒 Rotas Protegidas
+## ▶️ Como rodar
 
-Exemplo:
+npm install  
+npm start  
 
-POST /commands
+---
 
-Requer:
-
-Authorization: Bearer TOKEN
-📡 Endpoints
-Dispositivos
-GET /devices
-Enviar comando
-POST /commands
-{
-  "device": "cofre1",
-  "commands": [
-    { "command": "LED", "value": "ON" }
-  ]
-}
-Status do servidor
-GET /status
-⚙️ Configuração
-.env
-PORT=3000
-MONGO_URI=mongodb+srv://usuario:senha@cluster.mongodb.net/db
-JWT_SECRET=sua_chave_secreta
-▶️ Como rodar
-npm install
-npm start
-🔌 ESP32
-Bibliotecas
-WiFi.h
-WebSocketsClient.h
-ArduinoJson
-Conexão
-webSocket.beginSSL("seu-servidor.onrender.com", 443, "/");
-🧪 Testes
-
-Use:
-
-Postman
-Insomnia
-📌 Funcionalidades
-Comunicação WebSocket com ESP32
-Envio de comandos em batch
-Estado real do dispositivo
-Persistência no MongoDB
-Login com JWT
-Controle de acesso
-🚀 Próximos passos
-Dashboard em tempo real
-Controle por usuário
-Detecção de offline
-Login com OTP
-👨‍💻 Autor
+## 👨‍💻 Autor
 
 Leonardo
-
-📜 Licença
