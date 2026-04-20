@@ -1,4 +1,5 @@
 const { createUser } = require('../services/userService');
+const { loginUser } = require('../services/userService');
 
 module.exports.register = async (req, res) => {
     try {
@@ -34,6 +35,27 @@ module.exports.register = async (req, res) => {
             message: 'Usuário criado com sucesso',
             user
         });
+
+    } catch (error) {
+        return res.status(400).json({
+            error: error.message
+        });
+    }
+};
+
+module.exports.login = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({
+                error: 'Email é obrigatório'
+            });
+        }
+
+        const result = await loginUser(email);
+
+        return res.json(result);
 
     } catch (error) {
         return res.status(400).json({
