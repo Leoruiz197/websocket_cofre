@@ -1,11 +1,50 @@
 const Device = require('../models/Device');
 
+function generateSecret() {
+    const numbers = [];
+
+    while (numbers.length < 4) {
+        const n = Math.floor(Math.random() * 10).toString();
+
+        if (!numbers.includes(n)) {
+            numbers.push(n);
+        }
+    }
+
+    return numbers.join('');
+}
+
 module.exports.registerDevice = async (deviceId) => {
-    return await Device.findOneAndUpdate(
-        { deviceId },
-        { lastSeen: new Date() },
-        { upsert: true, new: true }
-    );
+
+    let device = await Device.findOne({ deviceId });
+
+    // 🔥 NOVO DEVICE
+    if (!device) {
+        device = await Device.create({
+            deviceId,
+            secret: generateSecret(),
+            status: "locked",
+            attempts: [],
+            lastSeen: new Date()
+        });
+
+        console.log(`Novo cofre criado: ${deviceId} | senha: ${device.secret}`);
+
+    } else {
+        // 🔄 DEVICE EXISTENTE
+        device.lastSeen = new Date();
+
+        // segurança: garante que tenha senha
+        if (!device.secret) {
+            device.secret = generateSecret();
+            device.status = "locked";
+            device.attempts = [];
+        }
+
+        await device.save();
+    }
+
+    return device;
 };
 
 module.exports.updateStatus = async (deviceId, status) => {
@@ -42,3 +81,4 @@ module.exports.updateDeviceState = async (deviceId, state) => {
 module.exports.getAllDevices = async () => {
     return await Device.find();
 };
+

@@ -11,6 +11,8 @@ const deviceRoutes = require('./routes/deviceRoutes');
 const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const queueRoutes = require('./routes/queueRoutes');
+const gameRoutes = require('./routes/gameRoutes');
+
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 
@@ -32,6 +34,8 @@ app.use('/devices', deviceRoutes);
 app.use('/users', userRoutes);
 app.use('/admin', adminRoutes);
 app.use('/queue', queueRoutes);
+app.use('/game', gameRoutes);
+
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Status
