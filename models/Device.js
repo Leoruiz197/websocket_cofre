@@ -5,6 +5,12 @@ const deviceSchema = new mongoose.Schema({
 
     // 🔐 senha do cofre
     secret: { type: String },
+    
+    state: {
+        type: String,
+        enum: ["online", "offline"],
+        default: "offline"
+    },
 
     // estado do cofre
     status: {

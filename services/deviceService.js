@@ -1,5 +1,8 @@
 const Device = require('../models/Device');
 
+// ======================
+// GERAR SENHA
+// ======================
 function generateSecret() {
     const numbers = [];
 
@@ -14,6 +17,9 @@ function generateSecret() {
     return numbers.join('');
 }
 
+// ======================
+// REGISTRAR DEVICE
+// ======================
 module.exports.registerDevice = async (deviceId) => {
 
     let device = await Device.findOne({ deviceId });
@@ -23,6 +29,7 @@ module.exports.registerDevice = async (deviceId) => {
         device = await Device.create({
             deviceId,
             secret: generateSecret(),
+            state: "online",
             status: "locked",
             attempts: [],
             lastSeen: new Date()
@@ -33,8 +40,8 @@ module.exports.registerDevice = async (deviceId) => {
     } else {
         // 🔄 DEVICE EXISTENTE
         device.lastSeen = new Date();
+        device.state = "online";
 
-        // segurança: garante que tenha senha
         if (!device.secret) {
             device.secret = generateSecret();
             device.status = "locked";
@@ -47,26 +54,37 @@ module.exports.registerDevice = async (deviceId) => {
     return device;
 };
 
+// ======================
+// ATUALIZAR STATUS DO JOGO
+// ======================
 module.exports.updateStatus = async (deviceId, status) => {
     return await Device.findOneAndUpdate(
         { deviceId },
         {
             status,
             lastSeen: new Date()
-        }
+        },
+        { new: true }
     );
 };
 
+// ======================
+// ATUALIZAR ÚLTIMO COMANDO
+// ======================
 module.exports.updateCommand = async (deviceId, commands) => {
     return await Device.findOneAndUpdate(
         { deviceId },
         {
             lastCommand: commands,
             lastSeen: new Date()
-        }
+        },
+        { new: true }
     );
 };
 
+// ======================
+// ATUALIZAR ESTADO (ONLINE/OFFLINE)
+// ======================
 module.exports.updateDeviceState = async (deviceId, state) => {
     return await Device.findOneAndUpdate(
         { deviceId },
@@ -78,7 +96,9 @@ module.exports.updateDeviceState = async (deviceId, state) => {
     );
 };
 
+// ======================
+// LISTAR DEVICES
+// ======================
 module.exports.getAllDevices = async () => {
     return await Device.find();
 };
-
