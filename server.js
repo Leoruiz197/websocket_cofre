@@ -9,6 +9,7 @@ const commandRoutes = require('./routes/commandRoutes');
 const deviceRoutes = require('./routes/deviceRoutes');
 const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const queueRoutes = require('./routes/queueRoutes');
 
 const app = express();
 app.use(express.json());
@@ -26,6 +27,7 @@ app.use('/commands', commandRoutes(clients));
 app.use('/devices', deviceRoutes);
 app.use('/users', userRoutes);
 app.use('/admin', adminRoutes);
+app.use('/queue', queueRoutes);
 
 // Status
 app.get('/status', (req, res) => {
