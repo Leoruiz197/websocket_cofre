@@ -1,6 +1,5 @@
 const Device = require('../models/Device');
 const Queue = require('../models/Queue');
-const { clients } = require('../websocket/wsServer');
 
 // =====================
 // VALIDAR JOGADA
@@ -56,23 +55,34 @@ async function validatePlayer(userId, deviceId) {
 // =====================
 // ENVIAR COMANDO PARA ESP
 // =====================
-function sendUnlockCommand(deviceId) {
+function sendUnlockCommand(deviceId, clients) {
+    console.log("Clients disponíveis:", Object.keys(clients));
+
     const client = clients[deviceId];
 
-    if (client && client.readyState === 1) {
-        client.send(JSON.stringify({
-            type: "batch",
-            commands: [
-                { command: "LOCK", value: "OPEN" }
-            ]
-        }));
+    if (!client) {
+        console.log("ESP não conectado no momento ❌");
+        return;
     }
-}
 
+    if (client.readyState !== 1) {
+        console.log("ESP não pronto ❌");
+        return;
+    }
+
+    console.log("Enviando comando OPEN 🔥");
+
+    client.send(JSON.stringify({
+        type: "batch",
+        commands: [
+            { command: "LOCK", value: "OPEN" }
+        ]
+    }));
+}
 // =====================
 // FAZER JOGADA
 // =====================
-module.exports.makeGuess = async (userId, deviceId, guess) => {
+module.exports.makeGuess = async (userId, deviceId, guess, clients) => {
 
     console.log("BODY:", guess);
     console.log("TYPE:", typeof guess);
@@ -118,7 +128,7 @@ module.exports.makeGuess = async (userId, deviceId, guess) => {
         device.status = "unlocked";
 
         // envia comando pro ESP abrir
-        sendUnlockCommand(deviceId);
+        sendUnlockCommand(deviceId, clients);
 
         // depois trava
         device.status = "blocked";

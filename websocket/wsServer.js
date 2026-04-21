@@ -6,7 +6,8 @@ const {
 
 let clients = {};
 
-module.exports = (server) => {
+// 🔥 EXPORTA A FUNÇÃO
+const setupWebSocket = (server) => {
     const wss = new WebSocket.Server({ server });
 
     wss.on('connection', (ws) => {
@@ -25,7 +26,7 @@ module.exports = (server) => {
                     await registerDevice(data.device);
                 }
 
-                // 🔥 STATUS REAL
+                // STATUS
                 if (data.type === "status" && data.device && data.state) {
                     console.log(`Estado recebido de ${data.device}:`, data.state);
 
@@ -40,6 +41,7 @@ module.exports = (server) => {
         ws.on('close', () => {
             if (ws.deviceId) {
                 console.log(`Dispositivo desconectado: ${ws.deviceId}`);
+
                 delete clients[ws.deviceId];
             }
         });
@@ -47,3 +49,9 @@ module.exports = (server) => {
 
     return { clients };
 };
+
+// 🔥 EXPORTA A FUNÇÃO
+module.exports = setupWebSocket;
+
+// 🔥 EXPORTA O OBJETO COMPARTILHADO (ESSENCIAL)
+module.exports.clients = clients;

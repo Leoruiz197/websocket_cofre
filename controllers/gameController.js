@@ -1,4 +1,5 @@
 const gameService = require('../services/gameService');
+const { clients } = require('../websocket/wsServer');
 
 // =====================
 // FAZER JOGADA
@@ -8,7 +9,12 @@ module.exports.guess = async (req, res) => {
         const userId = req.user.id;
         const { deviceId, guess } = req.body;
 
-        const result = await gameService.makeGuess(userId, deviceId, guess);
+        const result = await gameService.makeGuess(
+            userId,
+            deviceId,
+            guess,
+            clients // 🔥 ESSENCIAL
+        );
 
         res.json(result);
 
