@@ -1,6 +1,27 @@
+# Porta onde o servidor Node.js irá rodar
+# Exemplo: 3000
 PORT=
+
+# String de conexão com o MongoDB Atlas
+# Exemplo:
+# mongodb+srv://usuario:senha@cluster.mongodb.net/nomedobanco?retryWrites=true&w=majority
 MONGO_URI=
+
+# Chave secreta usada para gerar e validar tokens JWT
+# Use uma string longa e segura
+# Exemplo: minha_chave_super_secreta_123
 JWT_SECRET=
+
+# Tempo máximo que um usuário pode ficar usando o cofre (em milissegundos)
+# Exemplo: 120000 = 2 minutos
 QUEUE_TIME_LIMIT=
+
+# Quantidade máxima de vezes que um usuário pode reentrar na fila
+# Se for 0, não há limite
+# Exemplo: 3
 QUEUE_REJOIN_LIMIT=
+
+# Tempo de espera para permitir reentrada na fila (em milissegundos)
+# Exemplo: 30000 = 30 segundos
+# Se for 0, não há cooldown
 QUEUE_REJOIN_COOLDOWN=
