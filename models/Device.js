@@ -5,7 +5,7 @@ const deviceSchema = new mongoose.Schema({
 
     // 🔐 senha do cofre
     secret: { type: String },
-    
+
     state: {
         type: String,
         enum: ["online", "offline"],
@@ -17,6 +17,12 @@ const deviceSchema = new mongoose.Schema({
         type: String,
         enum: ["locked", "unlocked", "blocked"],
         default: "locked"
+    },
+    openedBy: {
+    type: String
+    },
+    openedAt: {
+        type: Date
     },
 
     // histórico de tentativas

@@ -122,15 +122,19 @@ module.exports.makeGuess = async (userId, deviceId, guess, clients) => {
     // 🎉 venceu
     let win = false;
 
-    if (otimos === 4) {
+    if (otimos === 4  && !device.openedBy) {
         win = true;
 
         device.status = "unlocked";
 
-        // envia comando pro ESP abrir
+        // 🔥 SALVA QUEM ABRIU
+        device.openedBy = userId;
+        device.openedAt = new Date();
+
+        // envia comando pro ESP
         sendUnlockCommand(deviceId, clients);
 
-        // depois trava
+        // trava depois
         device.status = "blocked";
     }
 
