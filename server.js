@@ -16,6 +16,8 @@ const gameRoutes = require('./routes/gameRoutes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 
+const { cleanupWaitingFirst } = require('./services/queueService');
+
 const app = express();
 app.use(cors());
 app.use(express.json());
