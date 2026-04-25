@@ -102,3 +102,25 @@ module.exports.updateDeviceState = async (deviceId, state) => {
 module.exports.getAllDevices = async () => {
     return await Device.find();
 };
+
+module.exports.getLockedDevices = async () => {
+    const devices = await Device.find(
+        { status: "locked" },
+        { deviceId: 1, _id: 0 } // 🔥 só retorna deviceId
+    );
+
+    // transforma em array simples
+    return devices.map(d => d.deviceId);
+};
+
+module.exports.getAvailableDevices = async () => {
+    const devices = await Device.find(
+        {
+            status: "locked",
+            state: "online"
+        },
+        { deviceId: 1, _id: 0 }
+    );
+
+    return devices.map(d => d.deviceId);
+};

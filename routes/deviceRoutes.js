@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAllDevices } = require('../services/deviceService');
+const { getAllDevices, getAvailableDevices, getLockedDevices  } = require('../services/deviceService');
 
 const router = express.Router();
 
@@ -69,6 +69,58 @@ const router = express.Router();
 router.get('/', async (req, res) => {
     try {
         const devices = await getAllDevices();
+        res.json(devices);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+/**
+ * @swagger
+ * /devices/locked:
+ *   get:
+ *     summary: Listar IDs dos dispositivos bloqueados (locked)
+ *     tags: [Devices]
+ *     responses:
+ *       200:
+ *         description: Lista de deviceIds com status locked
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: string
+ *               example: ["cofre1", "cofre2"]
+ */
+router.get('/locked', async (req, res) => {
+    try {
+        const devices = await getLockedDevices();
+        res.json(devices);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+/**
+ * @swagger
+ * /devices/available:
+ *   get:
+ *     summary: Listar dispositivos disponíveis (online e locked)
+ *     tags: [Devices]
+ *     responses:
+ *       200:
+ *         description: Lista de cofres disponíveis
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: string
+ *               example: ["cofre1", "cofre2"]
+ */
+router.get('/available', async (req, res) => {
+    try {
+        const devices = await getAvailableDevices();
         res.json(devices);
     } catch (err) {
         res.status(500).json({ error: err.message });
