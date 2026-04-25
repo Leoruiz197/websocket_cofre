@@ -236,10 +236,13 @@ module.exports.getUserPosition = async (userId, deviceId) => {
 
 module.exports.cleanupWaitingFirst = async () => {
 
+    console.log("📡 Verificando filas...");
+
     const devices = await Queue.distinct("deviceId");
 
     for (const deviceId of devices) {
 
+        // 🔥 pega o primeiro da fila
         const first = await Queue.findOne({
             deviceId,
             status: "waiting"
@@ -249,17 +252,42 @@ module.exports.cleanupWaitingFirst = async () => {
 
         const referenceTime = first.becameFirstAt || first.createdAt;
 
+        if (!referenceTime) {
+            console.log("❌ Sem tempo de referência");
+            continue;
+        }
+
         const diff = Date.now() - new Date(referenceTime).getTime();
 
         console.log(`⏱ ${deviceId} | user ${first.userId} | tempo: ${diff}`);
 
+        // 🔥 EXPIRA
         if (diff > TIME_LIMIT) {
+
             console.log(`⏰ Expirando ${first.userId}`);
 
             first.status = "expired";
             first.expiredAt = new Date();
 
             await first.save();
+
+            // ============================
+            // 🔥 PROMOVE O PRÓXIMO
+            // ============================
+
+            const next = await Queue.findOne({
+                deviceId,
+                status: "waiting"
+            }).sort({ createdAt: 1 });
+
+            if (next) {
+                next.becameFirstAt = new Date();
+                await next.save();
+
+                console.log(`➡️ Novo primeiro: ${next.userId}`);
+            } else {
+                console.log("📭 Fila vazia");
+            }
         }
     }
 };

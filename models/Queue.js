@@ -13,6 +13,8 @@ const queueSchema = new mongoose.Schema({
     joinedAt: { type: Date, default: Date.now },
     startedAt: { type: Date, default: null },
     finishedAt: { type: Date, default: null }
+},{
+    timestamps: true
 });
 
 module.exports = mongoose.model('Queue', queueSchema);
