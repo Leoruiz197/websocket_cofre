@@ -1,4 +1,5 @@
 const Queue = require('../models/Queue');
+
 const {
     TIME_LIMIT,
     REJOIN_LIMIT,
@@ -231,4 +232,30 @@ module.exports.getUserPosition = async (userId, deviceId) => {
         total: queue.length,
         status: queue[index].status
     };
+};
+
+module.exports.cleanupWaitingFirst = async () => {
+
+    const devices = await Queue.distinct("deviceId");
+
+    for (const deviceId of devices) {
+
+        const first = await Queue.findOne({
+            deviceId,
+            status: "waiting"
+        }).sort({ createdAt: 1 });
+
+        if (!first) continue;
+
+        const diff = Date.now() - new Date(first.createdAt).getTime();
+
+        if (diff > TIME_LIMIT) {
+            console.log(`⏰ Expirado: ${first.userId} no ${deviceId}`);
+
+            first.status = "expired";
+            first.expiredAt = new Date();
+
+            await first.save();
+        }
+    }
 };
