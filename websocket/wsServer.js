@@ -41,7 +41,7 @@ const setupWebSocket = (server) => {
         ws.on('close', () => {
             if (ws.deviceId) {
                 console.log(`Dispositivo desconectado: ${ws.deviceId}`);
-
+                await updateDeviceState(ws.deviceId, "offline");
                 delete clients[ws.deviceId];
             }
         });

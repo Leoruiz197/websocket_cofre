@@ -17,6 +17,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 
 const { cleanupWaitingFirst } = require('./services/queueService');
+const { cleanupOfflineDevices } = require('./services/deviceService');
 
 const app = express();
 app.use(cors());
@@ -58,3 +59,8 @@ setInterval(() => {
     console.log("🔁 Verificando fila...");
     cleanupWaitingFirst();
 }, Number(process.env.QUEUE_CHECK_INTERVAL) || 30000);
+
+setInterval(() => {
+    console.log("📡 Verificando dispositivos...");
+    cleanupOfflineDevices();
+}, Number(process.env.DEVICE_CHECK_INTERVAL) || 30000);

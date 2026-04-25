@@ -124,3 +124,33 @@ module.exports.getAvailableDevices = async () => {
 
     return devices.map(d => d.deviceId);
 };
+
+module.exports.cleanupOfflineDevices = async () => {
+
+    const TIME_LIMIT = Number(process.env.DEVICE_OFFLINE_TIMEOUT) || 60000;
+
+    const devices = await Device.find();
+
+    for (const device of devices) {
+
+        if (!device.lastSeen) continue;
+
+        const diff = Date.now() - new Date(device.lastSeen).getTime();
+
+        if (diff > TIME_LIMIT && device.state !== "offline") {
+
+            console.log(`🔴 ${device.deviceId} ficou OFFLINE`);
+
+            device.state = "offline";
+            await device.save();
+        }
+
+        if (diff <= TIME_LIMIT && device.state !== "online") {
+
+            console.log(`🟢 ${device.deviceId} voltou ONLINE`);
+
+            device.state = "online";
+            await device.save();
+        }
+    }
+};
