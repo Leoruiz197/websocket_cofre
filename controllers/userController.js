@@ -37,8 +37,20 @@ module.exports.register = async (req, res) => {
         });
 
     } catch (error) {
+        if (error.code === 11000 && error.keyPattern?.email) {
+        return res.status(409).json({
+            message: "Este e-mail já está cadastrado. Use outro e-mail ou continue com o cadastro existente.",
+        });
+        }
+
+        if (error.name === "ValidationError") {
         return res.status(400).json({
-            error: error.message
+            message: "Preencha todos os campos obrigatórios corretamente.",
+        });
+        }
+
+        return res.status(500).json({
+        message: "Erro interno ao realizar o cadastro.",
         });
     }
 };
