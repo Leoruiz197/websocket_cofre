@@ -38,7 +38,7 @@ const setupWebSocket = (server) => {
             }
         });
 
-        ws.on('close', () => {
+        ws.on('close', async () => {
             if (ws.deviceId) {
                 console.log(`Dispositivo desconectado: ${ws.deviceId}`);
                 await updateDeviceState(ws.deviceId, "offline");
