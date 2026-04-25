@@ -247,10 +247,14 @@ module.exports.cleanupWaitingFirst = async () => {
 
         if (!first) continue;
 
-        const diff = Date.now() - new Date(first.createdAt).getTime();
+        const referenceTime = first.becameFirstAt || first.createdAt;
+
+        const diff = Date.now() - new Date(referenceTime).getTime();
+
+        console.log(`⏱ ${deviceId} | user ${first.userId} | tempo: ${diff}`);
 
         if (diff > TIME_LIMIT) {
-            console.log(`⏰ Expirado: ${first.userId} no ${deviceId}`);
+            console.log(`⏰ Expirando ${first.userId}`);
 
             first.status = "expired";
             first.expiredAt = new Date();
